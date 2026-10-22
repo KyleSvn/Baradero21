@@ -181,48 +181,10 @@ INNER JOIN (
 ) Resumen ON B.IDBoleta = Resumen.IDBoleta;
 GO
 
--- ------------------------------------------------------------------------------
--- PASO 3: POBLADO DE STAGING (MARKETING, SATISFACCIÓN Y DELIVERY 2024-2026)
--- ------------------------------------------------------------------------------
-TRUNCATE TABLE Stg_Satisfaccion;
-TRUNCATE TABLE Stg_Publicidad;
-TRUNCATE TABLE Stg_Delivery;
 
-INSERT INTO Stg_Satisfaccion VALUES
-('2024-05-12', 'Los Olivos', 4, 'Buena sazón en los mariscos'),
-('2025-05-12', 'Comas', 3, 'Un poco de demora en hora punta'),
-('2026-05-12', 'Los Olivos', 5, 'Excelente la causa limeña'),
-('2026-05-12', 'Comas', 2, 'El lomo saltado llegó frío'),
-('2026-05-13', 'Puente Piedra', 4, 'Buena atención del mozo');
-
-INSERT INTO Stg_Publicidad VALUES
-('2024-05', 'Facebook Ads', 600.00, 'Los Olivos'),
-('2025-05', 'Tik Tok Ads', 750.00, 'Comas'),
-('2026-05', 'Facebook Ads', 850.00, 'Los Olivos'),
-('2026-05', 'Tik Tok Ads', 400.00, 'Comas'),
-('2026-05', 'Google Ads', 600.00, 'Puente Piedra'),
-('2026-06', 'Facebook Ads', 900.00, 'Los Olivos');
-
-INSERT INTO Stg_Delivery VALUES
-('2024-05-10', 'Los Olivos', 'Rappi', 350.00, 0.18),
-('2025-05-10', 'Comas', 'Pedidos Ya', 390.00, 0.15),
-('2026-05-10', 'Los Olivos', 'Rappi', 450.00, 0.18),
-('2026-05-10', 'Comas', 'Pedidos Ya', 320.00, 0.15),
-('2026-05-11', 'Puente Piedra', 'Rapi', 150.00, 0.18),
-('2026-05-11', 'Los Olivos', 'Didi Food', 200.00, 0.12),
-('2026-05-12', 'Comas', 'Pedidos', 410.00, 0.15);
-
--- Transformación y limpieza en Staging
-UPDATE Stg_Delivery
-SET Aplicativo = CASE 
-    WHEN Aplicativo IN ('Rapi', 'Rappi') THEN 'Rappi'
-    WHEN Aplicativo IN ('Pedidos', 'Pedidos Ya') THEN 'PedidosYa'
-    ELSE Aplicativo
-END;
-GO
 
 -- ------------------------------------------------------------------------------
--- PASO 4: CARGA DEL DATA MART (ESQUEMA ESTRELLA EN DataMartRestaurante)
+--CARGA DEL DATA MART (ESQUEMA ESTRELLA EN DataMartRestaurante)
 -- ------------------------------------------------------------------------------
 USE DataMartRestaurante;
 GO
@@ -314,7 +276,7 @@ LEFT JOIN ConteoItemsPorSedeFecha C
 GO
 
 -- ------------------------------------------------------------------------------
--- PASO 5: RESUMEN EJECUTIVO DE VALIDACIÓN (TOMAR CAPTURA PARA EL INFORME)
+--RESUMEN EJECUTIVO DE VALIDACIÓN (TOMAR CAPTURA PARA EL INFORME)
 -- ------------------------------------------------------------------------------
 SELECT 'Dim_Sede' AS Tabla, COUNT(*) AS Total_Registros FROM Dim_Sede
 UNION ALL SELECT 'Dim_Categoria', COUNT(*) FROM Dim_Categoria
