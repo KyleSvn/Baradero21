@@ -1,16 +1,8 @@
--- ==============================================================================
--- Proyecto: Business Intelligence - Restaurante Baradero 21
--- Script: 02_Poblado_Masivo_y_ETL_Baradero21.sql
--- Objetivo: Inserción masiva (Ene 2024 - Jun 2026) y Proceso ETL hacia Esquema Estrella
--- ==============================================================================
-
 SET NOCOUNT ON;
 USE BDRestaurante;
 GO
 
--- ------------------------------------------------------------------------------
--- PASO 1: LIMPIEZA E INSERCIÓN DE CATÁLOGOS EXACTOS (OLTP)
--- ------------------------------------------------------------------------------
+
 DELETE FROM Detalle_Boleta;
 DELETE FROM Boleta;
 DELETE FROM Gasto_Operativo;
@@ -24,7 +16,7 @@ DBCC CHECKIDENT ('Boleta', RESEED, 0);
 DBCC CHECKIDENT ('Gasto_Operativo', RESEED, 0);
 GO
 
--- 1.1 Tabla Sede
+
 SET IDENTITY_INSERT Sede ON;
 INSERT INTO Sede (IDSede, NombreSede, Distrito, Direccion) VALUES
 (1, 'Baradero 21 - Los Olivos', 'Los Olivos', 'Av. Alfredo Mendiola 1234'),
@@ -32,7 +24,6 @@ INSERT INTO Sede (IDSede, NombreSede, Distrito, Direccion) VALUES
 (3, 'Baradero 21 - Puente Piedra', 'Puente Piedra', 'Av. Panamericana Norte 9101');
 SET IDENTITY_INSERT Sede OFF;
 
--- 1.2 Tabla Categoria
 SET IDENTITY_INSERT Categoria ON;
 INSERT INTO Categoria (IDCategoria, NombreCategoria, Tipo) VALUES
 (1, 'Entradas', 'Plato'), (2, 'Platos de Fondo', 'Plato'), (3, 'Platos Criollos', 'Plato'),
@@ -40,7 +31,6 @@ INSERT INTO Categoria (IDCategoria, NombreCategoria, Tipo) VALUES
 (7, 'Bebidas Calientes', 'Bebida'), (8, 'Cócteles', 'Bebida'), (9, 'Menú del Día', 'Plato');
 SET IDENTITY_INSERT Categoria OFF;
 
--- 1.3 Tabla Empleado (21 empleados)
 SET IDENTITY_INSERT Empleado ON;
 INSERT INTO Empleado (IDEmpleado, IDSede, Nombres, Apellidos, Cargo, SalarioMensual) VALUES
 (1, 1, 'Juan', 'Pérez', 'Mozo', 1000.00), (2, 1, 'María', 'Gómez', 'Mozo', 1000.00),
@@ -56,7 +46,6 @@ INSERT INTO Empleado (IDEmpleado, IDSede, Nombres, Apellidos, Cargo, SalarioMens
 (21, 3, 'Ricardo', 'Ibáñez', 'Administrador', 1350.00);
 SET IDENTITY_INSERT Empleado OFF;
 
--- 1.4 Tabla Producto (40 productos)
 SET IDENTITY_INSERT Producto ON;
 INSERT INTO Producto (IDProducto, IDCategoria, NombreProducto, PrecioVenta, CostoProduccion) VALUES
 (1, 1, 'Ceviche Clásico', 35.00, 14.00), (2, 1, 'Causa Limeña', 25.00, 10.00),
@@ -82,10 +71,8 @@ INSERT INTO Producto (IDProducto, IDCategoria, NombreProducto, PrecioVenta, Cost
 SET IDENTITY_INSERT Producto OFF;
 GO
 
--- ------------------------------------------------------------------------------
--- PASO 2: GENERACIÓN MASIVA DE BOLETAS, DETALLES Y GASTOS (2024 - JUN 2026)
--- ------------------------------------------------------------------------------
--- 2.1 Generar Gastos Operativos diarios por cada Sede (912 días x 3 sedes = 2,736 registros)
+
+    --GENERACION BOLETAS
 WITH Fechas AS (
     SELECT CAST('2024-01-01' AS DATE) AS Fecha
     UNION ALL
@@ -97,19 +84,18 @@ INSERT INTO Gasto_Operativo (IDSede, Fecha, Gasto_Insumos, Gasto_Personal, Gasto
 SELECT 
     S.IDSede,
     F.Fecha,
-    -- Gasto de insumos variable según día y sede
+
     CAST(120 + (ABS(CHECKSUM(NEWID())) % 60) AS DECIMAL(10,2)) AS Gasto_Insumos,
-    -- Planilla diaria (7 empleados por sede: 3 mozos, 3 cocineros, 1 admin = S/ 7,950 al mes / 30 días = S/ 265.00 diario)
+
     CAST(265.00 AS DECIMAL(10,2)) AS Gasto_Personal,
-    -- Costo de alquiler y servicios prorrateado por día según sede
+
     CAST(CASE S.IDSede WHEN 1 THEN 150.00 WHEN 2 THEN 120.00 ELSE 110.00 END AS DECIMAL(10,2)) AS Gasto_Local
 FROM Fechas F
 CROSS JOIN Sede S
 OPTION (MAXRECURSION 1000);
 GO
 
--- 2.2 Generar ~8,200 Boletas distribuidas entre 2024, 2025 y 2026-S1
--- Con crecimiento progresivo anual para que en Power BI se vea tendencia positiva en YoY
+
 WITH Fechas AS (
     SELECT CAST('2024-01-01' AS DATE) AS Fecha
     UNION ALL
@@ -124,7 +110,7 @@ TurnosDia AS (
 INSERT INTO Boleta (IDSede, IDEmpleado, FechaEmision, HoraEmision, TotalVenta)
 SELECT 
     S.IDSede,
-    -- Asignar exclusivamente mozos de la sede correspondiente (Sede 1: 1-3, Sede 2: 8-10, Sede 3: 15-17)
+    
     CASE S.IDSede 
         WHEN 1 THEN 1 + (ABS(CHECKSUM(NEWID())) % 3)
         WHEN 2 THEN 8 + (ABS(CHECKSUM(NEWID())) % 3)
@@ -132,19 +118,19 @@ SELECT
     END AS IDEmpleado,
     F.Fecha,
     DATEADD(MINUTE, ABS(CHECKSUM(NEWID())) % 600, CAST('12:00:00' AS TIME)) AS HoraEmision,
-    0.00 AS TotalVenta -- Se actualiza exactamente en el paso 2.4
+    0.00 AS TotalVenta --
 FROM Fechas F
 CROSS JOIN Sede S
 CROSS JOIN TurnosDia T
 WHERE 
-    -- En 2024 entran hasta 2-3 boletas por lote, en 2025 hasta 4, en 2026 entran las 5 (simula crecimiento de ventas)
+    
     (YEAR(F.Fecha) = 2024 AND T.NumBoleta <= 3)
     OR (YEAR(F.Fecha) = 2025 AND T.NumBoleta <= 4)
     OR (YEAR(F.Fecha) = 2026 AND T.NumBoleta <= 5)
 OPTION (MAXRECURSION 1000);
 GO
 
--- 2.3 Generar ~20,000 registros en Detalle_Boleta (entre 2 y 3 platos/bebidas por boleta)
+
 ;WITH ItemsPorBoleta AS (
     SELECT 1 AS ItemNum UNION ALL SELECT 2 UNION ALL SELECT 3
 ),
@@ -152,13 +138,13 @@ DetalleGenerado AS (
     SELECT 
         B.IDBoleta,
         I.ItemNum,
-        -- Selecciona un IDProducto aleatorio entre 1 y 40
+        
         1 + (ABS(CHECKSUM(NEWID(), B.IDBoleta, I.ItemNum)) % 40) AS IDProducto,
-        -- Cantidad entre 1 y 3 unidades por plato
+        
         1 + (ABS(CHECKSUM(NEWID(), B.IDBoleta)) % 3) AS Cantidad
     FROM Boleta B
     CROSS JOIN ItemsPorBoleta I
-    WHERE I.ItemNum <= 2 OR (B.IDBoleta % 2 = 0) -- Mitad de boletas con 2 ítems, mitad con 3 ítems
+    WHERE I.ItemNum <= 2 OR (B.IDBoleta % 2 = 0) 
 )
 INSERT INTO Detalle_Boleta (IDBoleta, IDProducto, Cantidad, SubTotal)
 SELECT 
@@ -170,7 +156,7 @@ FROM DetalleGenerado DG
 INNER JOIN Producto P ON DG.IDProducto = P.IDProducto;
 GO
 
--- 2.4 Actualizar TotalVenta en la cabecera Boleta para que cuadre al 100% con Detalle_Boleta
+
 UPDATE B
 SET B.TotalVenta = Resumen.SumaSubTotal
 FROM Boleta B
@@ -183,9 +169,7 @@ GO
 
 
 
--- ------------------------------------------------------------------------------
---CARGA DEL DATA MART (ESQUEMA ESTRELLA EN DataMartRestaurante)
--- ------------------------------------------------------------------------------
+--DATA MART
 USE DataMartRestaurante;
 GO
 
@@ -203,7 +187,7 @@ DBCC CHECKIDENT ('Dim_Categoria', RESEED, 0);
 DBCC CHECKIDENT ('Dim_Empleado', RESEED, 0);
 GO
 
--- 4.1 Cargar Dimensiones
+
 INSERT INTO Dim_Sede (PK_Sede, NombreSede, Distrito, Direccion)
 SELECT IDSede, NombreSede, Distrito, Direccion FROM BDRestaurante.dbo.Sede;
 
@@ -216,7 +200,7 @@ SELECT IDProducto, NombreProducto, PrecioVenta, CostoProduccion FROM BDRestauran
 INSERT INTO Dim_Empleado (PK_Empleado, Nombres, Apellidos, Cargo, SalarioMensual)
 SELECT IDEmpleado, Nombres, Apellidos, Cargo, SalarioMensual FROM BDRestaurante.dbo.Empleado;
 
--- 4.2 Cargar Dim_Tiempo (2024-01-01 hasta 2026-06-30)
+
 SET LANGUAGE Spanish;
 WITH FechasDim AS (
     SELECT CAST('2024-01-01' AS DATE) AS Fecha
@@ -237,7 +221,7 @@ FROM FechasDim
 OPTION (MAXRECURSION 1000);
 GO
 
--- 4.3 Cargar Fact_Ventas (Con prorrateo exacto de gastos operativos diarios)
+-- carga factVentas
 WITH ConteoItemsPorSedeFecha AS (
     SELECT 
         B.IDSede, 
@@ -275,9 +259,7 @@ LEFT JOIN ConteoItemsPorSedeFecha C
     ON B.IDSede = C.IDSede AND B.FechaEmision = C.FechaEmision;
 GO
 
--- ------------------------------------------------------------------------------
---RESUMEN EJECUTIVO DE VALIDACIÓN (TOMAR CAPTURA PARA EL INFORME)
--- ------------------------------------------------------------------------------
+--resumen
 SELECT 'Dim_Sede' AS Tabla, COUNT(*) AS Total_Registros FROM Dim_Sede
 UNION ALL SELECT 'Dim_Categoria', COUNT(*) FROM Dim_Categoria
 UNION ALL SELECT 'Dim_Empleado', COUNT(*) FROM Dim_Empleado
@@ -285,38 +267,23 @@ UNION ALL SELECT 'Dim_Producto', COUNT(*) FROM Dim_Producto
 UNION ALL SELECT 'Dim_Tiempo (2024 - Jun 2026)', COUNT(*) FROM Dim_Tiempo
 UNION ALL SELECT 'Fact_Ventas (Hechos)', COUNT(*) FROM Fact_Ventas;
 
--- Vista previa de Rentabilidad Anual para verificar que los KPIs salgan en positivo
-SELECT 
-    T.Anio,
-    COUNT(F.ID_Venta) AS Total_Platos_Vendidos,
-    SUM(F.Ingreso_Total) AS Ingreso_Ventas_Soles,
-    SUM(F.Costo_Insumos + F.Gasto_Personal_Asignado + F.Gasto_Local_Asignado) AS Costo_Total_Operacion,
-    SUM(F.Ingreso_Total) - SUM(F.Costo_Insumos + F.Gasto_Personal_Asignado + F.Gasto_Local_Asignado) AS Utilidad_Neta
-FROM Fact_Ventas F
-INNER JOIN Dim_Tiempo T ON F.Fecha = T.Fecha
-GROUP BY T.Anio
-ORDER BY T.Anio;
-GO
 
 
-
--- ==============================================================================
--- PARCHE RÁPIDO: AJUSTE DE VOLUMEN COMERCIAL PARA UTILIDAD NETA POSITIVA
--- ==============================================================================
+-----actualizacion boletas
 USE BDRestaurante;
 GO
 
--- 1. Ajustar cantidad por línea de pedido (pedidos familiares/mesas de 3 a 6 platos)
+-- 
 UPDATE Detalle_Boleta
 SET Cantidad = Cantidad + 2 + (IDDetalle % 2);
 
--- 2. Recalcular SubTotal en Detalle_Boleta
+-- 2
 UPDATE DB
 SET DB.SubTotal = DB.Cantidad * P.PrecioVenta
 FROM Detalle_Boleta DB
 INNER JOIN Producto P ON DB.IDProducto = P.IDProducto;
 
--- 3. Recalcular TotalVenta en cabecera Boleta
+-- 3
 UPDATE B
 SET B.TotalVenta = Resumen.SumaSubTotal
 FROM Boleta B
@@ -327,7 +294,7 @@ INNER JOIN (
 ) Resumen ON B.IDBoleta = Resumen.IDBoleta;
 GO
 
--- 4. Actualizar las medidas de ingresos y costos de insumos en el Data Mart
+-- 4
 USE DataMartRestaurante;
 GO
 
@@ -340,7 +307,7 @@ FROM Fact_Ventas FV
 INNER JOIN Dim_Producto DP ON FV.ID_Producto = DP.ID_Producto;
 GO
 
--- 5. Verificar nuevamente el resumen financiero (Ahora con Utilidad Neta Positiva)
+--resumen financiero
 SELECT 
     T.Anio,
     SUM(F.Cantidad) AS Total_Unidades_Vendidas,
