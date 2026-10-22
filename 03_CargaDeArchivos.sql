@@ -1,7 +1,7 @@
 USE DataMartRestaurante;
 GO
 
--- Asegurar que las tablas Staging existan en DataMartRestaurante
+
 IF OBJECT_ID('dbo.Stg_Satisfaccion', 'U') IS NULL
     CREATE TABLE Stg_Satisfaccion (Fecha DATE, Sede VARCHAR(100), Puntuacion INT, Comentario VARCHAR(255));
 
@@ -12,15 +12,13 @@ IF OBJECT_ID('dbo.Stg_Delivery', 'U') IS NULL
     CREATE TABLE Stg_Delivery (Fecha DATE, Sede_Nombre VARCHAR(100), Aplicativo VARCHAR(50), Monto_Bruto_Vendido DECIMAL(10,2), Porcentaje_Comision DECIMAL(5,2));
 GO
 
--- Limpiar Staging antes de cargar 
+
 TRUNCATE TABLE Stg_Satisfaccion;
 TRUNCATE TABLE Stg_Publicidad;
 TRUNCATE TABLE Stg_Delivery;
 GO
 
--- =====================================================
--- PASO 3: CARGA MASIVA DE ARCHIVOS EXTERNOS (STAGING)
--- =====================================================
+
 BULK INSERT Stg_Satisfaccion
 FROM 'D:\ETL\Baradero\satisfaccion_cliente.txt'
 WITH (
@@ -52,9 +50,7 @@ WITH (
 );
 GO
 
--- =====================================================
--- PASO 4: CARGAR FACT_VENTAS (PROCESO DE CARGA)
--- =====================================================
+--proceso de  carga
     
 IF COL_LENGTH('dbo.Fact_Ventas', 'Costo_Total') IS NULL
     ALTER TABLE dbo.Fact_Ventas ADD Costo_Total DECIMAL(10,2);
@@ -93,7 +89,7 @@ SELECT
     (DB.Cantidad * DP.CostoProduccion) AS Costo_Insumos,
     ISNULL(GOp.Gasto_Personal / NULLIF(C.TotalLineasDia, 0), 0) AS Gasto_Personal_Asignado,
     ISNULL(GOp.Gasto_Local / NULLIF(C.TotalLineasDia, 0), 0) AS Gasto_Local_Asignado,
-    -- Costo_Total suma Insumos + Personal + Local para cumplir el KPI del profesor
+   
     (DB.Cantidad * DP.CostoProduccion) 
         + ISNULL(GOp.Gasto_Personal / NULLIF(C.TotalLineasDia, 0), 0) 
         + ISNULL(GOp.Gasto_Local / NULLIF(C.TotalLineasDia, 0), 0) AS Costo_Total
@@ -116,13 +112,13 @@ LEFT JOIN ConteoItemsPorSedeFecha C
     ON B.IDSede = C.IDSede AND B.FechaEmision = C.FechaEmision;
 GO
 
--- Verificación de tablas Staging
+-- verificacion tablas
 SELECT * FROM Stg_Publicidad;
 SELECT * FROM Stg_Satisfaccion;
 SELECT * FROM Stg_Delivery;
 GO
 
--- CONTEO GENERAL DE REGISTROS  
+-- CONTEO 
 SELECT 'Dim_Sede' AS Tabla, COUNT(*) AS Registros FROM Dim_Sede
 UNION ALL SELECT 'Dim_Producto', COUNT(*) FROM Dim_Producto
 UNION ALL SELECT 'Dim_Categoria', COUNT(*) FROM Dim_Categoria
