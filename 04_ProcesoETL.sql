@@ -1,10 +1,7 @@
--- =====================================================
--- PROCESO ETL - FASE DE TRANSFORMACIÓN
--- =====================================================
 USE DataMartRestaurante;
 GO
 
--- 1. Transformación de Delivery (Homologación de nombres y cálculo de comisión y venta neta)
+
 SELECT 
     D.Fecha,
     S.ID_Sede,
@@ -23,7 +20,7 @@ INNER JOIN Dim_Sede S
     ON D.Sede_Nombre = S.Distrito;
 GO
 
--- 2. Transformación de Publicidad (Cruce con clave subrogada ID_Sede)
+
 SELECT 
     P.Periodo,
     P.Plataforma_Ad,
@@ -35,7 +32,7 @@ INNER JOIN Dim_Sede S
     ON P.Sede_Objetivo = S.Distrito;
 GO
 
--- 3. Transformación de Satisfacción (Cruce con ID_Sede y limpieza de comentarios vacíos)
+
 SELECT 
     ST.Fecha,
     S.ID_Sede,
@@ -47,7 +44,7 @@ INNER JOIN Dim_Sede S
     ON ST.Sede = S.Distrito;
 GO
 
--- 4. Transformación de Ventas OLTP (Cálculo de Ingreso_Total, Costo_Total y Utilidad Bruta)
+--
 SELECT 
     B.IDBoleta,
     B.FechaEmision,
