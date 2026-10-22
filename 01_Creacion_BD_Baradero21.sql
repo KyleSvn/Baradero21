@@ -1,11 +1,3 @@
--- ==============================================================================
--- Proyecto: Business Intelligence para Restaurante Baradero 21
--- Objetivo: Creación de BD Transaccional (OLTP) y Data Mart (OLAP)
--- ==============================================================================
-
--- ------------------------------------------------------------------------------
--- FASE 1: CREACIÓN DE BASE DE DATOS TRANSACCIONAL (OLTP) Y STAGING
--- ------------------------------------------------------------------------------
 IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'BDRestaurante')
     CREATE DATABASE BDRestaurante;
 GO
@@ -76,7 +68,6 @@ CREATE TABLE Gasto_Operativo (
     FOREIGN KEY (IDSede) REFERENCES Sede(IDSede)
 )
 
--- Tablas temporales (Staging) para carga de archivos planos
 CREATE TABLE Stg_Delivery (
     Fecha DATE,
     Sede_Nombre VARCHAR(100),
@@ -100,9 +91,7 @@ CREATE TABLE Stg_Satisfaccion (
 )
 GO
 
--- ------------------------------------------------------------------------------
--- FASE 2: CREACIÓN DEL DATA MART (OLAP - MODELO ESTRELLA)
--- ------------------------------------------------------------------------------
+
 IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'DataMartRestaurante')
     CREATE DATABASE DataMartRestaurante;
 GO
@@ -110,7 +99,7 @@ GO
 USE DataMartRestaurante
 GO
 
--- 2.1 Tablas de Dimensiones
+
 CREATE TABLE Dim_Sede (
     ID_Sede INT IDENTITY(1,1) PRIMARY KEY,
     PK_Sede INT,
@@ -153,23 +142,23 @@ CREATE TABLE Dim_Tiempo (
 )
 GO
 
--- 2.2 Tabla de Hechos 
+
 CREATE TABLE Fact_Ventas (
     ID_Venta INT IDENTITY(1,1) PRIMARY KEY,
-    -- Claves foráneas a las 5 dimensiones
+
     ID_Sede INT REFERENCES Dim_Sede(ID_Sede),
     ID_Producto INT REFERENCES Dim_Producto(ID_Producto),
     ID_Categoria INT REFERENCES Dim_Categoria(ID_Categoria),
     ID_Empleado INT REFERENCES Dim_Empleado(ID_Empleado),
     Fecha DATE REFERENCES Dim_Tiempo(Fecha),
     
-    -- Medidas Ventas
+
     Cantidad INT,
     Ingreso_Total DECIMAL(10,2),
     
-    -- Medidas de Costos 
+
     Costo_Insumos DECIMAL(10,2), 
-    Gasto_Personal_Asignado DECIMAL(10,2) DEFAULT 0, -- Se llenará en el ETL
-    Gasto_Local_Asignado DECIMAL(10,2) DEFAULT 0     -- Se llenará en el ETL
+    Gasto_Personal_Asignado DECIMAL(10,2) DEFAULT 0,
+    Gasto_Local_Asignado DECIMAL(10,2) DEFAULT 0    
 )
 GO
