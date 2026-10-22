@@ -1,0 +1,23 @@
+Fecha,Sede,Puntuacion1-5,Comentario_Cliente
+2024-02-14,Los Olivos,5,Excelente atención por San Valentín
+2024-03-20,Comas,4,Buen sabor del ceviche clásico
+2024-05-10,Puente Piedra,3,Demoró un poco el pedido en mesa
+2024-07-28,Los Olivos,5,El pollo a la brasa estuvo en su punto
+2024-09-15,Comas,2,Había mucho ruido en el salón
+2024-11-22,Puente Piedra,4,
+2025-01-18,Los Olivos,5,Muy buena la jalea mixta y la chicha
+2025-03-08,Comas,4,Porciones generosas en el menú ejecutivo
+2025-05-11,Puente Piedra,5,Excelente ambiente familiar por Día de la Madre
+2025-07-29,Los Olivos,3,Faltaban postres en la noche
+2025-10-12,Comas,5,El arroz con mariscos estuvo espectacular
+2025-12-20,Puente Piedra,4,Buena atención aunque el local estaba lleno
+2026-01-25,Los Olivos,5,Los cócteles muy bien preparados
+2026-02-14,Comas,4,Rápida atención de los mozos
+2026-03-19,Puente Piedra,3,
+2026-04-10,Los Olivos,5,La causa limeña y el pisco sour excelentes
+2026-05-12,Los Olivos,5,Excelente la causa limeña
+2026-05-12,Comas,2,El lomo saltado llegó frío
+2026-05-13,Puente Piedra,4,Buena atención del mozo
+2026-05-14,Los Olivos,5,
+2026-06-15,Comas,5,Mejoraron mucho la temperatura de los platos
+2026-06-20,Puente Piedra,5,Recomendado al 100 por ciento
