@@ -1,0 +1,31 @@
+Periodo,Plataforma_Ad,Inversion_Soles,Sede_Objetivo
+2024-01,Facebook Ads,600.00,Los Olivos
+2024-01,TikTok Ads,350.00,Comas
+2024-01,Google Ads,450.00,Puente Piedra
+2024-04,Facebook Ads,650.00,Los Olivos
+2024-04,TikTok Ads,380.00,Comas
+2024-04,Google Ads,480.00,Puente Piedra
+2024-07,Facebook Ads,720.00,Los Olivos
+2024-07,TikTok Ads,420.00,Comas
+2024-07,Google Ads,520.00,Puente Piedra
+2024-10,Facebook Ads,750.00,Los Olivos
+2024-10,TikTok Ads,410.00,Comas
+2024-10,Google Ads,530.00,Puente Piedra
+2025-01,Facebook Ads,780.00,Los Olivos
+2025-01,TikTok Ads,450.00,Comas
+2025-01,Google Ads,550.00,Puente Piedra
+2025-05,Facebook Ads,800.00,Los Olivos
+2025-05,TikTok Ads,430.00,Comas
+2025-05,Google Ads,580.00,Puente Piedra
+2025-09,Facebook Ads,820.00,Los Olivos
+2025-09,TikTok Ads,460.00,Comas
+2025-09,Google Ads,590.00,Puente Piedra
+2026-01,Facebook Ads,840.00,Los Olivos
+2026-01,TikTok Ads,440.00,Comas
+2026-01,Google Ads,610.00,Puente Piedra
+2026-05,Facebook Ads,850.00,Los Olivos
+2026-05,TikTok Ads,400.00,Comas
+2026-05,Google Ads,600.00,Puente Piedra
+2026-06,Facebook Ads,900.00,Los Olivos
+2026-06,TikTok Ads,480.00,Comas
+2026-06,Google Ads,650.00,Puente Piedra

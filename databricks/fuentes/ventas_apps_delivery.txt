@@ -1,0 +1,23 @@
+Fecha,Sede_Nombre,Aplicativo,Monto_Bruto_Vendido,Porcentaje_Comision
+2024-02-10,Los Olivos,Rappi,380.00,0.18
+2024-02-10,Comas,PedidosYa,290.00,0.15
+2024-05-15,Puente Piedra,Rapi,210.00,0.18
+2024-08-20,Los Olivos,Didi Food,250.00,0.12
+2024-11-05,Comas,Pedidos Ya,340.00,0.15
+2025-01-12,Los Olivos,Rappi,420.00,0.18
+2025-03-18,Comas,Pedidos,360.00,0.15
+2025-06-22,Puente Piedra,Rapi,280.00,0.18
+2025-09-14,Los Olivos,Didi Food,310.00,0.12
+2025-12-01,Comas,Pedidos Ya,450.00,0.15
+2026-01-15,Puente Piedra,Rappi,320.00,0.18
+2026-02-20,Los Olivos,Rapi,490.00,0.18
+2026-03-10,Comas,PedidosYa,395.00,0.15
+2026-04-05,Puente Piedra,Didi Food,260.00,0.12
+2026-05-10,Los Olivos,Rappi,450.00,0.18
+2026-05-10,Comas,PedidosYa,320.00,0.15
+2026-05-11,Puente Piedra,Rapi,150.00,0.18
+2026-05-11,Los Olivos,Didi Food,200.00,0.12
+2026-05-12,Comas,Pedidos Ya,410.00,0.15
+2026-06-08,Los Olivos,Rappi,520.00,0.18
+2026-06-14,Comas,Pedidos Ya,440.00,0.15
+2026-06-25,Puente Piedra,Didi Food,295.00,0.12

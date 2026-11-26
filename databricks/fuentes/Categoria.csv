@@ -1,0 +1,10 @@
+﻿ID_Categoria,PK_Categoria,NombreCategoria,Tipo
+0,1,Entradas,Plato
+1,2,Platos de Fondo,Plato
+2,3,Platos Criollos,Plato
+3,4,Mariscos,Plato
+4,5,Postres,Postre
+5,6,Bebidas Frías,Bebida
+6,7,Bebidas Calientes,Bebida
+7,8,Cócteles,Bebida
+8,9,Menú del Día,Plato
