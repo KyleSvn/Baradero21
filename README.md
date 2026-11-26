@@ -21,4 +21,3 @@ Proyecto académico de inteligencia de negocios y Big Data para analizar los ing
 2. Carga en `csv/` las exportaciones `Fact_Ventas.csv`, `Sede.csv`, `Producto.csv`, `Categoria.csv`, `Empleado.csv` y `Tiempo.csv`. Esas exportaciones se preparan a partir del BI. Carga los tres archivos de [`datos/`](datos/) en `txt/`.
 3. Importa y ejecuta el notebook en Databricks. El PDF permite revisar el dashboard de la entrega.
 
-[Versión anterior a la reorganización](https://github.com/KyleSvn/Baradero21/tree/5efe1584ca0a29e01835e868e8c143e4f9ae8ea3)
